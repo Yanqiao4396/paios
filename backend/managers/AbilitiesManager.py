@@ -11,6 +11,8 @@ from backend.dependencies.PythonDependency import PythonDependency
 from backend.dependencies.ResourceDependency import ResourceDependency
 from backend.dependencies.LinuxDependency import LinuxDependency
 from backend.dependencies.ContainerDependency import ContainerDependency
+from backend.dependencies.NpmDependency import NpmDependency
+
 
 import logging
 logger = logging.getLogger(__name__)
@@ -47,7 +49,8 @@ class AbilitiesManager:
             'python': PythonDependency(),
             'resource': ResourceDependency(),
             'linux': LinuxDependency(),
-            'container': ContainerDependency()
+            'container': ContainerDependency(),
+            'npm': NpmDependency()
         }
 
     def _load_abilities(self):

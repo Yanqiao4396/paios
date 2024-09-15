@@ -1,0 +1,170 @@
+from backend.dependencies.Dependency import Dependency
+import asyncio
+import pkg_resources
+import requests
+import subprocess
+import importlib
+from backend.dependencies.SemverSpecifier import SemverVersion
+from backend.dependencies.SemverSpecifier import SemverSpecifierSet
+from packaging.specifiers import SpecifierSet
+from pkg_resources import ContextualVersionConflict
+
+import logging
+logger = logging.getLogger(__name__)
+
+import shutil
+npm_path = shutil.which("npm")
+
+class NpmDependency(Dependency):
+    def handle_exception(self, exception):
+        if isinstance(exception, ContextualVersionConflict):
+            logger.error(f"Version conflict detected: {exception}")
+            return {"error": f"Version conflict detected: {exception}"}
+        else:
+            return super().handle_exception(exception)
+
+    def refresh_status(self, ability, dependency):
+        try:
+            package_name = dependency.get('id')
+            required_version = dependency.get('required', '')
+            raise KeyError(package_name+required_version)
+            versions = dependency.get('versions', {})
+
+            self._refresh_versions(package_name, required_version, versions)
+
+            if versions:
+                dependency['versions'] = versions
+        except Exception as e:
+            self.handle_exception(e)
+
+    def _refresh_versions(self, package_name, required_version, versions):
+        installed_version = self._get_installed_version(package_name)
+        if installed_version:
+            versions['installed'] = installed_version
+
+        available_versions, latest_version = self._get_available_versions(package_name)
+        if available_versions:
+            satisfactory_versions = self._get_satisfactory_versions(available_versions, required_version)
+            if satisfactory_versions:
+                versions['available'] = satisfactory_versions
+
+            if latest_version:
+                versions['latest'] = latest_version
+        # Add satisfied flag
+        satisfied = self._is_satisfied(installed_version, versions.get('available', []))
+        logger.debug(f"Setting satisfied for {package_name}: {satisfied}")
+        versions['satisfied'] = satisfied
+
+    #TODO: may need to edit this cuz it's related to satisfactory versions
+    def _is_satisfied(self, installed_version, satisfactory_versions):
+        if not installed_version or not satisfactory_versions:
+            logger.debug(f"Installed version or satisfactory versions are missing: installed_version={installed_version}, satisfactory_versions={satisfactory_versions}")
+            return False
+        is_satisfied = installed_version in satisfactory_versions
+        logger.debug(f"Checking if installed version {installed_version} is in satisfactory versions {satisfactory_versions}: {is_satisfied}")
+        return is_satisfied
+
+    #TODO: may need to edit this cuz it's related to pkg_resources
+    def _get_installed_version(self, package_name):
+        try:
+            dist = pkg_resources.get_distribution(package_name)
+            return dist.version
+        except pkg_resources.DistributionNotFound:
+            return None
+
+    def _get_available_versions(self, package_name):
+        try:
+            response = requests.get(f"https://registry.npmjs.org/{package_name}")
+            response.raise_for_status()
+            data = response.json()
+            available_versions = sorted(data['versions'].keys(), reverse=True)
+            try:
+                latest_version = subprocess.run([npm_path, "view", package_name, "version"], text=True, stdout=subprocess.PIPE)
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Failed to retrieve package version for {package_name}: {e}")
+            except Exception as e:
+                logger.error(f"Unexpected error occurred while retrieving package version for {package_name}: {e}")
+            return available_versions, latest_version
+        except requests.RequestException as e:
+            logger.error(f"Error fetching available versions for {package_name}: {e}")
+            return None, None
+
+    def _get_satisfactory_versions(self, available_versions, required_version):
+        if not available_versions:
+            return []
+        try:
+            specifier = SemverSpecifierSet(required_version)
+            return sorted([version for version in available_versions if specifier.contains(SemverVersion(version))], reverse=True)
+        except Exception as e:
+            logger.error(f"Error getting satisfactory versions: {e}")
+            return []
+
+    async def _install(self, ability, dependency, background=False):
+        if background:
+            self._run_in_background(self._install_task, ability, dependency)
+        else:
+            return await self._install_task(ability, dependency)
+
+    async def _install_task(self, ability, dependency):
+        package_name = dependency.get('id')
+        required_version = dependency.get('required', '')
+
+        if required_version:
+            if not required_version.startswith(('==', '>=', '<=', '~=', '!=')):
+                required_version = '==' + required_version
+        else:
+            required_version = ''
+
+        package_with_version = f"{package_name}@{required_version}"
+
+        def run_subprocess():
+            try:
+                result = subprocess.run(
+                    [npm_path, 'install', '-g', package_with_version],
+                    capture_output=True,
+                    text=True
+                )
+                return result
+            except Exception as e:
+                logger.error(f"Subprocess execution failed: {e}")
+                raise
+
+        def reload_package(package_name):
+            try:
+                package_module = importlib.import_module(package_name)
+                importlib.reload(package_module)
+            except ImportError:
+                pass
+            except Exception as e:
+                logger.error(f"Error reloading {package_name}: {e}")
+
+        def get_installed_package_version(package_name):
+            try:
+                result = subprocess.run([npm_path, "list", package_name], text=True, stdout=subprocess.PIPE)
+                for line in result.stdout.split('\n'):
+                    if line.startswith('Version:'):
+                        return line.split('Version:')[1].strip()
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Failed to retrieve package version for {package_name}: {e}")
+            except Exception as e:
+                logger.error(f"Unexpected error occurred while retrieving package version for {package_name}: {e}")
+            return None
+
+        result = await asyncio.get_event_loop().run_in_executor(None, run_subprocess)
+        if result.returncode == 0:
+            logger.info(f"Successfully installed {package_with_version}")
+            reload_package(package_name)
+            package_version = get_installed_package_version(package_name)
+            dependency['version-installed'] = package_version
+            dependency['satisfied'] = self._is_satisfied(package_version, dependency['versions'].get('available', []))
+            return {"message": f"Successfully installed {package_with_version} ({package_version})."}
+        else:
+            error_message = result.stderr
+            logger.error(f"Failed to install {package_with_version}: {error_message}")
+            raise ValueError(f"Installation failed: {error_message}")
+
+    def start(self, ability, dependency):
+        pass
+
+    def stop(self, ability, dependency):
+        pass

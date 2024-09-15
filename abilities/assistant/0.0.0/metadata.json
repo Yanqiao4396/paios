@@ -1,0 +1,249 @@
+{
+    "id": "assistant",
+    "name": "Kwaai Assistant",
+    "versions": {
+        "package": "0.0.0",
+        "product": "0"
+    },
+    "description": "Kwaai AI Assistant.",
+    "author": {
+        "name": "Kwaai",
+        "url": "https://www.kwaai.ai"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Kwaai-AI-Lab/kwaai-ui.git#development"
+    },
+    "language": "JavaScript",
+    "scripts": {
+        "start": "main.py"
+    },
+    "license": "TODO",
+    "dependencies": [
+        {
+            "type": "npm",
+            "id": "@fortawesome/fontawesome-svg-core",
+            "name": "Fontawesome Svg Core",
+            "versions":
+                {
+                    "required": ">=6.5.2,<7.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "@fortawesome/free-brands-svg-icons",
+            "name": "Fontawesome Free Brands Svg Icons",
+            "versions":
+                {
+                    "required": ">=6.5.2,<7.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "@fortawesome/free-regular-svg-icons",
+            "name": "Fontawesome Free Regular Svg Icons",
+            "versions":
+                {
+                    "required": ">=6.5.2,<7.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "@fortawesome/free-solid-svg-icons",
+            "name": "Fontawesome Free Solid Svg Icons",
+            "versions":
+                {
+                    "required": ">=6.5.2,<7.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "@fortawesome/react-fontawesome",
+            "name": "Fontawesome React Fontawesome",
+            "versions":
+                {
+                    "required": ">=0.2.2,<1.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "@prisma/client",
+            "name": "Prisma Client",
+            "versions":
+                {
+                    "required": ">=5.16.1,<6.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "@testing-library/jest-dom",
+            "name": "Testing Library Jest Dom",
+            "versions":
+                {
+                    "required": ">=5.17.0,<6.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "@testing-library/react",
+            "name": "Testing Library React",
+            "versions":
+                {
+                    "required": ">=13.4.0,<14.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "@testing-library/user-event",
+            "name": "Testing Library User Event",
+            "versions":
+                {
+                    "required": ">=13.5.0,<14.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "axios",
+            "name": "Axios",
+            "versions":
+                {
+                    "required": ">=1.7.2,<2.0.0"
+                } 
+        },
+        {
+            "type": "npm",
+            "id": "body-parser",
+            "name": "Body Parser",
+            "versions":
+                {
+                    "required": ">=1.20.2,<2.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "connect-pg-simple",
+            "name": "Connect Pg Simple",
+            "versions":
+                {
+                    "required": ">=9.0.1,<10.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "cors",
+            "name": "Cors",
+            "versions":
+                {
+                    "required": ">=2.8.5,<3.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "express",
+            "name": "Express",
+            "versions":
+                {
+                    "required": ">=4.19.2,<5.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "express-session",
+            "name": "Express Session",
+            "versions":
+                {
+                    "required": ">=1.18.0,<2.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "ra-data-simple-rest",
+            "name": "Ra Data Simple Rest",
+            "versions":
+                {
+                    "required": ">=5.0.1,<6.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "react",
+            "name": "React",
+            "versions":
+                {
+                    "required": ">=18.3.1,<19.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "react-admin",
+            "name": "React Admin",
+            "versions":
+                {
+                    "required": ">=5.0.1,<6.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "react-dom",
+            "name": "React Dom",
+            "versions":
+                {
+                    "required": ">=18.3.1,<19.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "react-dropzone",
+            "name": "React Dropzone",
+            "versions":
+                {
+                    "required": ">=14.2.3,<15.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "react-icons",
+            "name": "React Icons",
+            "versions":
+                {
+                    "required": ">=5.2.1,<6.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "react-modal",
+            "name": "React Modal",
+            "versions":
+                {
+                    "required": ">=3.16.1,<4.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "react-router-dom",
+            "name": "React Router Dom",
+            "versions":
+                {
+                    "required": ">=6.24.0,<7.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "react-scripts",
+            "name": "React Scripts",
+            "versions":
+                {
+                    "required": ">=5.0.1,<6.0.0"
+                }
+        },
+        {
+            "type": "npm",
+            "id": "web-vitals",
+            "name": "Web Vitals",
+            "versions":
+                {
+                    "required": ">=2.1.4,<3.0.0"
+                }
+        }
+    ]
+}
